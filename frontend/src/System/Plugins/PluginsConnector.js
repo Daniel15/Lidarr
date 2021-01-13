@@ -4,17 +4,20 @@ import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
 import * as commandNames from 'Commands/commandNames';
 import { executeCommand } from 'Store/Actions/commandActions';
+import { fetchInstalledPlugins } from 'Store/Actions/systemActions';
 import createCommandExecutingSelector from 'Store/Selectors/createCommandExecutingSelector';
 import Plugins from './Plugins';
 
 function createMapStateToProps() {
   return createSelector(
+    (state) => state.system.plugins,
     createCommandExecutingSelector(commandNames.INSTALL_PLUGIN),
     (
+      plugins,
       isInstallingPlugin
     ) => {
-
       return {
+        ...plugins,
         isInstallingPlugin
       };
     }
@@ -22,10 +25,19 @@ function createMapStateToProps() {
 }
 
 const mapDispatchToProps = {
+  dispatchFetchInstalledPlugins: fetchInstalledPlugins,
   dispatchExecuteCommand: executeCommand
 };
 
 class PluginsConnector extends Component {
+
+  //
+  // Lifecycle
+
+  componentDidMount() {
+    this.props.dispatchFetchInstalledPlugins();
+  }
+
   //
   // Listeners
 
@@ -51,6 +63,7 @@ class PluginsConnector extends Component {
 }
 
 PluginsConnector.propTypes = {
+  dispatchFetchInstalledPlugins: PropTypes.func.isRequired,
   dispatchExecuteCommand: PropTypes.func.isRequired
 };
 
